@@ -25,36 +25,26 @@ public static class StableSegment
 
         if (values.Count == 1) return (0, 1);
 
-        var dict = new Dictionary<int, int>(values.Count);
+        var dict = new SortedSet<(int Value, int Idx)>();
 
-        for (int i = values.Count; i > 1; --i)
+        for (int i = 0; i < values.Count; ++i)
         {
-            int iterCount = 0;
-
-            for (int j = 0; j < values.Count - i + 1; j++)
-            {
-                var tmp = values.Skip(j).Take(i);
-                var max = tmp.Max();
-                var min = tmp.Min();
-
-                if (Math.Abs((long)max - min) <= maxDifference)
-                {
-                    dict.Add(j, i);
-                    iterCount++;
-                }
-            }
-
-            if (iterCount > 0) break;
+            dict.Add((values[i], i));
         }
 
-        if (dict.Count > 1)
+        var max = dict.Last();
+        var min = dict.First();
+        var count = dict.Count;
+
+        while (Math.Abs((long)max.Value - min.Value) > maxDifference && count > 1)
         {
-            var res = dict.MinBy(x => x.Key);
-            return (res.Key, res.Value);
+            --count;
+            max = dict.ElementAt(count);
         }
 
-        if (dict.Count == 0) return (0, 1);
+        if (Math.Abs((long)max.Value - min.Value) > maxDifference)
+            return (0, 1);
 
-        return (dict.First().Key, dict.First().Value);
+        return (dict.First().Idx, max.Idx - min.Idx + 1);
     }
 }
