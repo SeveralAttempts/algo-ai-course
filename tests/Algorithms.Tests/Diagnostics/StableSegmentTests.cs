@@ -110,9 +110,57 @@ public class StableSegmentTests
         List<int> list = new List<int> { 0, 9, 18, 13, 5, 14, 23 };
         var diff = -1;
 
-        Assert.Throws<ArgumentOutOfRangeException>(() =>
+        var e = Assert.Throws<ArgumentOutOfRangeException>(() =>
         {
             StableSegment.LongestStableSegment(list, diff);
         });
+        Assert.Equal("maxDifference", e.ParamName);
+    }
+
+    [Fact]
+    public void NeedToCheckMinAndMax()
+    {
+        List<int> list = new List<int> { 5, 10, 0 };
+        var diff = 5;
+
+        var maxmin = StableSegment.LongestStableSegment(list, diff);
+
+        Assert.Equal(maxmin, (0, 2));
+    }
+
+    [Fact]
+    public void NullWithPositive()
+    {
+        var diff = 100;
+
+        var e = Assert.Throws<ArgumentNullException>(() =>
+        {
+            StableSegment.LongestStableSegment(null!, diff);
+        });
+        Assert.Equal("values", e.ParamName);
+    }
+
+    [Fact]
+    public void NullWithNegative()
+    {
+        var diff = -1;
+
+        var e = Assert.Throws<ArgumentNullException>(() =>
+        {
+            StableSegment.LongestStableSegment(null!, diff);
+        });
+        Assert.Equal("values", e.ParamName);
+    }
+
+    [Fact]
+    public void EmptyWithNegative()
+    {
+        var diff = -1;
+
+        var e = Assert.Throws<ArgumentOutOfRangeException>(() =>
+        {
+            StableSegment.LongestStableSegment(new List<int>(), diff);
+        });
+        Assert.Equal("maxDifference", e.ParamName);
     }
 }

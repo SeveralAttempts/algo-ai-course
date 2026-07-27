@@ -10,55 +10,65 @@ public static class StableSegment
         IReadOnlyList<int> values,
         int maxDifference)
     {
-        if (!values.Any()) return (0, 0);
-
         if (values == null)
         {
-            string? paramName = "List of values can't be null.";
+            string? paramName = $"values";
             throw new ArgumentNullException(paramName);
         }
 
         if (maxDifference < 0)
         {
-            string? paramName = "Max difference value should be not negative.";
+            string? paramName = $"maxDifference";
             throw new ArgumentOutOfRangeException(paramName);
         }
+
+        if (!values.Any()) return (0, 0);
 
         if (values.Count == 1) return (0, 1);
 
         var dict = new SortedSet<(int Value, int Idx)>();
 
-        int c = 0;
+        int right = -1; 
+        int left = 0;
 
-        foreach (var item in values)
+        (int Idx, int Len) bestValue = new (0, 0);
+
+        bool accept = true;
+
+        while (right < values.Count - 1)
         {
-            dict.Add((item, c));
-            c++;
-        }
-
-        int start = default;
-
-        (int Value, int Idx) max = default;
-        (int Value, int Idx) min = default;
-
-        for (int i = values.Count; i > 1; --i)
-        {
-            for (int j = 0; j < values.Count - i + 1; j++)
+            if (accept)
             {
-                var newDict = dict
-
-                max = dict.Max();
-                min = dict.Min();
-                start = j;
-
-                if (Math.Abs((long)max.Value - min.Value) <= maxDifference)
-                    break;
+                right++;
+                dict.Add((values[right], right));
             }
+            else
+            {
+                dict.Remove((values[left], left));
+                left++;
+            }
+
+            if (Math.Abs((long)dict.Max.Value - dict.Min.Value) > maxDifference)
+            {
+                if (bestValue.Len >= right - left + 1)
+                {
+                    accept = true;
+                    continue;
+                }
+                accept = false;
+                continue;
+            }
+
+            if (bestValue.Len >= right - left + 1)
+            {
+                accept = true;
+                continue;
+            }
+
+            bestValue = new (left, right - left + 1);
+            accept = true;
         }
 
-        if (Math.Abs((long)max.Value - min.Value) > maxDifference)
-            return (0, 1);
-
-        return (start, max.Idx - min.Idx + 1);
+        return bestValue;
     }
 }
