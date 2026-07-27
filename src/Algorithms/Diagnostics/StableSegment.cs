@@ -1,5 +1,6 @@
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Security.Cryptography.X509Certificates;
 
 namespace Algorithms.Diagnostics;
 
@@ -27,24 +28,37 @@ public static class StableSegment
 
         var dict = new SortedSet<(int Value, int Idx)>();
 
-        for (int i = 0; i < values.Count; ++i)
+        int c = 0;
+
+        foreach (var item in values)
         {
-            dict.Add((values[i], i));
+            dict.Add((item, c));
+            c++;
         }
 
-        var max = dict.Last();
-        var min = dict.First();
-        var count = dict.Count;
+        int start = default;
 
-        while (Math.Abs((long)max.Value - min.Value) > maxDifference && count > 1)
+        (int Value, int Idx) max = default;
+        (int Value, int Idx) min = default;
+
+        for (int i = values.Count; i > 1; --i)
         {
-            --count;
-            max = dict.ElementAt(count);
+            for (int j = 0; j < values.Count - i + 1; j++)
+            {
+                var newDict = dict
+
+                max = dict.Max();
+                min = dict.Min();
+                start = j;
+
+                if (Math.Abs((long)max.Value - min.Value) <= maxDifference)
+                    break;
+            }
         }
 
         if (Math.Abs((long)max.Value - min.Value) > maxDifference)
             return (0, 1);
 
-        return (dict.First().Idx, max.Idx - min.Idx + 1);
+        return (start, max.Idx - min.Idx + 1);
     }
 }
