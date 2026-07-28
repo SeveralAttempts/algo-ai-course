@@ -163,4 +163,15 @@ public class StableSegmentTests
         });
         Assert.Equal("maxDifference", e.ParamName);
     }
+
+    [Fact]
+    public void LengthAcceptance()
+    {
+        List<int> list = new List<int> { 1, 100, 101 };
+        var diff = 5;
+
+        var maxmin = StableSegment.LongestStableSegment(list, diff);
+
+        Assert.Equal(maxmin, (1, 2));
+    }
 }
